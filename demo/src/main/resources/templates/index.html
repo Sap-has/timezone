@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Time Zone Buddy</title>
+    <!-- Auto-refresh every 60 seconds -->
+    <meta http-equiv="refresh" content="60">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" type="text/css">
+</head>
+<body>
+    <header>
+        <h1>Time Zone Buddy</h1>
+    </header>
+
+    <main>
+        <!-- Form to add a timezone -->
+        <section id="add-timezone">
+            <h2>Add a Timezone</h2>
+            <form method="post" action="/addTimezone">
+                <label for="timezone">Select Timezone:</label>
+                <select name="timezone" id="timezone">
+                    <!-- Populate the dropdown with available time zones -->
+                    <th:block th:each="zone : ${timezones}">
+                        <option th:value="${zone}" th:text="${zone}"></option>
+                    </th:block>
+                </select>
+                <button type="submit">Add Timezone</button>
+            </form>
+            <div th:if="${error}">
+                <p class="error" th:text="${error}"></p>
+            </div>
+        </section>
+
+        <!-- Table displaying the selected timezones and their current times -->
+        <section id="timezone-table">
+            <h2>Current Times</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timezone</th>
+                        <th>Current Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tz : ${selectedTimezones}">
+                        <td th:text="${tz}"></td>
+                        <!-- Format current time to "yyyy-MM-dd HH:mm" using DateTimeFormatter -->
+                        <td th:text="${T(java.time.ZonedDateTime).now(T(java.time.ZoneId).of(tz)).format(T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm'))}"></td>
+                        <td>
+                            <!-- Remove form for each timezone -->
+                            <form method="post" action="/removeTimezone">
+                                <input type="hidden" name="timezone" th:value="${tz}">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Time Zone Buddy</p>
+    </footer>
+</body>
+</html>
